@@ -10,13 +10,64 @@ function Show-Menu {
 }
 
 function Get-SystemInfo {
-    Write-Host "`n--- Informacoes do Sistema ---" -ForegroundColor Green
-    Write-Host "Nome do Computador: $env:COMPUTERNAME"
-    Write-Host "Usuario: $env:USERNAME"
-    Write-Host "Versao do Windows: " (Get-WmiObject -Class Win32_OperatingSystem).Caption
-    Write-Host "IP Local: " (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "*Loopback*"} | Select-Object -ExpandProperty IPAddress)
-    Write-Host "Espaco em Disco (C:):"
-    Get-PSDrive C | Select-Object Used, Free
+    Clear-Host
+    Write-Host "`n========= INFORMACOES DO SISTEMA =========" -ForegroundColor Green
+
+    # --- SISTEMA OPERACIONAL E USUARIO ---
+    Write-Host "`n--- SISTEMA E USUARIO ---" -ForegroundColor Green
+    $os = Get-WmiObject Win32_OperatingSystem
+    Write-Host "Nome do Computador........: $env:COMPUTERNAME"
+    Write-Host "Usuario Atual.............: $env:USERNAME"
+    Write-Host "Sistema Operacional.......: $($os.Caption)"
+    Write-Host "Versao....................: $($os.Version)"
+    Write-Host "Build.....................: $($os.BuildNumber)"
+    Write-Host "Arquitetura...............: $($os.OSArchitecture)"
+    $ultimoBoot = [System.Management.ManagementDateTimeConverter]::ToDateTime($os.LastBootUpTime)
+Write-Host ("Ultimo Boot...............: {0}" -f $ultimoBoot)
+
+
+    # --- HARDWARE ---
+    Write-Host "`n--- HARDWARE ---" -ForegroundColor Green
+    $cs = Get-WmiObject Win32_ComputerSystem
+    $cpu = Get-WmiObject Win32_Processor
+    Write-Host "Fabricante................: $($cs.Manufacturer)"
+    Write-Host "Modelo....................: $($cs.Model)"
+    Write-Host "Processador...............: $($cpu.Name)"
+    Write-Host "Velocidade Max............: $($cpu.MaxClockSpeed) MHz"
+    Write-Host "Nucleos Fisicos...........: $($cpu.NumberOfCores)"
+    Write-Host "Nucleos Logicos...........: $($cpu.NumberOfLogicalProcessors)"
+    Write-Host "Memoria RAM Total.........: $([math]::Round($cs.TotalPhysicalMemory / 1GB, 2)) GB"
+    Write-Host "Memoria RAM Livre.........: $([math]::Round($os.FreePhysicalMemory / 1MB, 2)) MB"
+
+# --- REDE ---
+Write-Host "`n--- REDE ---" -ForegroundColor Green
+$ips = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -notlike '169.*' -and $_.InterfaceAlias -notlike '*Loopback*' }
+$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true }
+
+foreach ($ip in $ips) {
+    $adapter = $adapters | Where-Object { $_.Description -like "*$($ip.InterfaceAlias)*" -or $_.InterfaceIndex -eq $ip.InterfaceIndex }
+    
+    Write-Host ("Interface.................: {0}" -f $ip.InterfaceAlias)
+    Write-Host ("IP........................: {0}"  -f $ip.IPAddress)
+    if ($adapter) {
+    Write-Host ("Descricao.................: {0}" -f $adapter.Description)
+    Write-Host ("MAC Address...............: {0}" -f $adapter.MACAddress)
+    Write-Host ("Dominio...................: {0}" -f (Get-WmiObject Win32_ComputerSystem).Domain)
+    Write-Host ("Gateway...................: {0}" -f ($adapter.DefaultIPGateway -join ', '))
+    Write-Host ("DNS Servers...............: {0}" -f ($adapter.DNSServerSearchOrder -join ', '))
+    } else {
+        Write-Host "  (Informacoes adicionais nao encontradas para esta interface)"
+    }
+}
+
+    # --- DISCO RIGIDO ---
+    Write-Host "`n--- DISCO RIGIDO ---" -ForegroundColor Green
+    Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
+        $total = [math]::Round($_.Size / 1GB, 2)
+        $livre = [math]::Round($_.FreeSpace / 1GB, 2)
+        $usado = $total - $livre
+        Write-Host "Unidade $($_.DeviceID): Total: $total GB | Usado: $usado GB | Livre: $livre GB | Sistema de Arquivos: $($_.FileSystem)"
+    }
     Pause
 }
 
