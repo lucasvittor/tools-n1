@@ -4,13 +4,21 @@
     Clear-Host
 function Show-Menu {
     Clear-Host
-    Write-Host "===== SUPORTE N1 =====" 
-    Write-Host "1. Informacoes do Sistema"
-    Write-Host "2. Diagnostico de Rede"
-    Write-Host "3. Limpeza de Sistema"
-    Write-Host "4. Ferramentas Rapidas"
-    Write-Host "5. Sair"
+    $titulo = " SUPORTE N1 - BY LUCAS VITOR "
+    $linha = "=" * 40
+    Write-Host ""
+    Write-Host $linha -ForegroundColor Green
+    Write-Host $titulo.PadLeft(($titulo.Length + $linha.Length) / 2).PadRight($linha.Length) -ForegroundColor Green
+    Write-Host $linha -ForegroundColor Green
+    Write-Host ""
+    Write-Host " [1] Informacoes do Sistema"     -ForegroundColor Green
+    Write-Host " [2] Diagnostico de Rede"        -ForegroundColor Green
+    Write-Host " [3] Limpeza de Sistema"         -ForegroundColor Green
+    Write-Host " [4] Ferramentas Rapidas"        -ForegroundColor Green
+    Write-Host " [5] Sair"                       -ForegroundColor Green
+    Write-Host ""
 }
+
 
 function Get-SystemInfo {
     Clear-Host
@@ -19,28 +27,28 @@ function Get-SystemInfo {
     # --- SISTEMA OPERACIONAL E USUARIO ---
     Write-Host "`n--- SISTEMA E USUARIO ---" 
     $os = Get-WmiObject Win32_OperatingSystem
-    Write-Host "Nome do Computador........: $env:COMPUTERNAME"
-    Write-Host "Usuario Atual.............: $env:USERNAME"
-    Write-Host "Sistema Operacional.......: $($os.Caption)"
-    Write-Host "Versao....................: $($os.Version)"
-    Write-Host "Build.....................: $($os.BuildNumber)"
-    Write-Host "Arquitetura...............: $($os.OSArchitecture)"
+    Write-Host " Nome do Computador........: $env:COMPUTERNAME"
+    Write-Host " Usuario Atual.............: $env:USERNAME"
+    Write-Host " Sistema Operacional.......: $($os.Caption)"
+    Write-Host " Versao....................: $($os.Version)"
+    Write-Host " Build.....................: $($os.BuildNumber)"
+    Write-Host " Arquitetura...............: $($os.OSArchitecture)"
     $ultimoBoot = [System.Management.ManagementDateTimeConverter]::ToDateTime($os.LastBootUpTime)
-Write-Host ("Ultimo Boot...............: {0}" -f $ultimoBoot)
+Write-Host (" Ultimo Boot...............: {0}" -f $ultimoBoot)
 
 
     # --- HARDWARE ---
     Write-Host "`n--- HARDWARE ---" 
     $cs = Get-WmiObject Win32_ComputerSystem
     $cpu = Get-WmiObject Win32_Processor
-    Write-Host "Fabricante................: $($cs.Manufacturer)"
-    Write-Host "Modelo....................: $($cs.Model)"
-    Write-Host "Processador...............: $($cpu.Name)"
-    Write-Host "Velocidade Max............: $($cpu.MaxClockSpeed) MHz"
-    Write-Host "Nucleos Fisicos...........: $($cpu.NumberOfCores)"
-    Write-Host "Nucleos Logicos...........: $($cpu.NumberOfLogicalProcessors)"
-    Write-Host "Memoria RAM Total.........: $([math]::Round($cs.TotalPhysicalMemory / 1GB, 2)) GB"
-    Write-Host "Memoria RAM Livre.........: $([math]::Round($os.FreePhysicalMemory / 1MB, 2)) MB"
+    Write-Host " Fabricante................: $($cs.Manufacturer)"
+    Write-Host " Modelo....................: $($cs.Model)"
+    Write-Host " Processador...............: $($cpu.Name)"
+    Write-Host " Velocidade Max............: $($cpu.MaxClockSpeed) MHz"
+    Write-Host " Nucleos Fisicos...........: $($cpu.NumberOfCores)"
+    Write-Host " Nucleos Logicos...........: $($cpu.NumberOfLogicalProcessors)"
+    Write-Host " Memoria RAM Total.........: $([math]::Round($cs.TotalPhysicalMemory / 1GB, 2)) GB"
+    Write-Host " Memoria RAM Livre.........: $([math]::Round($os.FreePhysicalMemory / 1MB, 2)) MB"
 
 # --- REDE ---
 Write-Host "`n--- REDE ---" 
@@ -50,16 +58,16 @@ $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.
 foreach ($ip in $ips) {
     $adapter = $adapters | Where-Object { $_.Description -like "*$($ip.InterfaceAlias)*" -or $_.InterfaceIndex -eq $ip.InterfaceIndex }
     
-    Write-Host ("Interface.................: {0}" -f $ip.InterfaceAlias)
-    Write-Host ("IP........................: {0}"  -f $ip.IPAddress)
+    Write-Host (" Interface.................: {0}" -f $ip.InterfaceAlias)
+    Write-Host (" IP........................: {0}"  -f $ip.IPAddress)
     if ($adapter) {
-    Write-Host ("Descricao.................: {0}" -f $adapter.Description)
-    Write-Host ("MAC Address...............: {0}" -f $adapter.MACAddress)
-    Write-Host ("Dominio...................: {0}" -f (Get-WmiObject Win32_ComputerSystem).Domain)
-    Write-Host ("Gateway...................: {0}" -f ($adapter.DefaultIPGateway -join ', '))
-    Write-Host ("DNS Servers...............: {0}" -f ($adapter.DNSServerSearchOrder -join ', '))
+    Write-Host (" Descricao.................: {0}" -f $adapter.Description)
+    Write-Host (" MAC Address...............: {0}" -f $adapter.MACAddress)
+    Write-Host (" Dominio...................: {0}" -f (Get-WmiObject Win32_ComputerSystem).Domain)
+    Write-Host (" Gateway...................: {0}" -f ($adapter.DefaultIPGateway -join ', '))
+    Write-Host (" DNS Servers...............: {0}" -f ($adapter.DNSServerSearchOrder -join ', '))
     } else {
-        Write-Host "  (Informacoes adicionais nao encontradas para esta interface)"
+        Write-Host "  ( Informacoes adicionais nao encontradas para esta interface)"
     }
 }
 
@@ -69,7 +77,7 @@ foreach ($ip in $ips) {
         $total = [math]::Round($_.Size / 1GB, 2)
         $livre = [math]::Round($_.FreeSpace / 1GB, 2)
         $usado = $total - $livre
-        Write-Host "Unidade $($_.DeviceID): Total: $total GB | Usado: $usado GB | Livre: $livre GB | Sistema de Arquivos: $($_.FileSystem)"
+        Write-Host " Unidade $($_.DeviceID): Total: $total GB | Usado: $usado GB | Livre: $livre GB | Sistema de Arquivos: $($_.FileSystem)"
     }
     Pause
 }
@@ -86,7 +94,7 @@ function Test-NetworkDiagnostics {
 function Clear-SystemTemp {
     Write-Host "`n--- Limpeza de Sistema ---" 
     Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "Arquivos temporarios removidos."
+    Write-Host " Arquivos temporarios removidos."
     Pause
 }
 
@@ -101,7 +109,7 @@ function Start-QuickTools {
 
 do {
     Show-Menu
-    $opcao = Read-Host "Escolha uma opcao"
+    $opcao = Read-Host " Escolha uma opcao "
     switch ($opcao) {
         "1" { Get-SystemInfo }
         "2" { Test-NetworkDiagnostics }

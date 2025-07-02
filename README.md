@@ -1,7 +1,7 @@
 # 🖥️ Suporte N1 - PowerShell Tools
 
 <div>
-    <img src="img/home.jpg" style="width: 100%; max-width: 700px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <img src="img/home.png" style="width: 100%; max-width: 700px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 </div>
 
 **Status:** ✅ Em Desenvolvimento  
