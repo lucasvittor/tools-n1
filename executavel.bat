@@ -1,2 +1,4 @@
 @echo off
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process PowerShell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"C:\Users\L7CAS\Documents\PROJETOS\SHELL\WINDOWS\tools-n1\orig\orig.ps1\"' -Verb RunAs"
+color 0A
+%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass ^
+-Command "Start-Process '%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe' -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"%~dp0orig\tools.ps1\"' -Verb RunAs"

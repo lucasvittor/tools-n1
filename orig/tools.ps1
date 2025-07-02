@@ -1,7 +1,10 @@
 # Script: Suporte-N1.ps1
+    $Host.UI.RawUI.BackgroundColor = "black"
+    $Host.UI.RawUI.ForegroundColor = "green"
+    Clear-Host
 function Show-Menu {
     Clear-Host
-    Write-Host "===== SUPORTE N1 =====" -ForegroundColor Green
+    Write-Host "===== SUPORTE N1 =====" 
     Write-Host "1. Informacoes do Sistema"
     Write-Host "2. Diagnostico de Rede"
     Write-Host "3. Limpeza de Sistema"
@@ -11,10 +14,10 @@ function Show-Menu {
 
 function Get-SystemInfo {
     Clear-Host
-    Write-Host "`n========= INFORMACOES DO SISTEMA =========" -ForegroundColor Green
+    Write-Host "`n========= INFORMACOES DO SISTEMA =========" 
 
     # --- SISTEMA OPERACIONAL E USUARIO ---
-    Write-Host "`n--- SISTEMA E USUARIO ---" -ForegroundColor Green
+    Write-Host "`n--- SISTEMA E USUARIO ---" 
     $os = Get-WmiObject Win32_OperatingSystem
     Write-Host "Nome do Computador........: $env:COMPUTERNAME"
     Write-Host "Usuario Atual.............: $env:USERNAME"
@@ -27,7 +30,7 @@ Write-Host ("Ultimo Boot...............: {0}" -f $ultimoBoot)
 
 
     # --- HARDWARE ---
-    Write-Host "`n--- HARDWARE ---" -ForegroundColor Green
+    Write-Host "`n--- HARDWARE ---" 
     $cs = Get-WmiObject Win32_ComputerSystem
     $cpu = Get-WmiObject Win32_Processor
     Write-Host "Fabricante................: $($cs.Manufacturer)"
@@ -40,7 +43,7 @@ Write-Host ("Ultimo Boot...............: {0}" -f $ultimoBoot)
     Write-Host "Memoria RAM Livre.........: $([math]::Round($os.FreePhysicalMemory / 1MB, 2)) MB"
 
 # --- REDE ---
-Write-Host "`n--- REDE ---" -ForegroundColor Green
+Write-Host "`n--- REDE ---" 
 $ips = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -notlike '169.*' -and $_.InterfaceAlias -notlike '*Loopback*' }
 $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true }
 
@@ -61,7 +64,7 @@ foreach ($ip in $ips) {
 }
 
     # --- DISCO RIGIDO ---
-    Write-Host "`n--- DISCO RIGIDO ---" -ForegroundColor Green
+    Write-Host "`n--- DISCO RIGIDO ---" 
     Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
         $total = [math]::Round($_.Size / 1GB, 2)
         $livre = [math]::Round($_.FreeSpace / 1GB, 2)
@@ -72,7 +75,7 @@ foreach ($ip in $ips) {
 }
 
 function Test-NetworkDiagnostics {
-    Write-Host "`n--- Diagnostico de Rede ---" -ForegroundColor Green
+    Write-Host "`n--- Diagnostico de Rede ---" 
     ipconfig /release
     ipconfig /renew
     ipconfig /flushdns
@@ -81,14 +84,14 @@ function Test-NetworkDiagnostics {
 }
 
 function Clear-SystemTemp {
-    Write-Host "`n--- Limpeza de Sistema ---" -ForegroundColor Green
+    Write-Host "`n--- Limpeza de Sistema ---" 
     Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "Arquivos temporarios removidos."
     Pause
 }
 
 function Start-QuickTools {
-    Write-Host "`n--- Abertura de Ferramentas ---" -ForegroundColor Green
+    Write-Host "`n--- Abertura de Ferramentas ---" 
     Start-Process control
     Start-Process taskmgr
     Start-Process devmgmt.msc
